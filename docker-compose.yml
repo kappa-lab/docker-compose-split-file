@@ -3,11 +3,19 @@ version: '3'
 services:
   db:
     image: mysql:latest
+    volumes:
+      - ./docker-entrypoint-initdb:/docker-entrypoint-initdb.d
     environment:
       - MYSQL_ROOT_PASSWORD=root
   app:
     image: golang:1.20-alpine
-    tty: true
+    # 初回起動時はDBが接続可能になるまで数秒かかる
+    command: go run ./
+    environment:
+      - DB_PATH=db:3306
+    working_dir: /go/src/github.com/kappa-lab/docker-compose-mysql/
+    volumes: 
+      - ./:/go/src/github.com/kappa-lab/docker-compose-mysql/
     depends_on:
       - db
     
